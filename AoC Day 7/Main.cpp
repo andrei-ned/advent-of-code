@@ -37,7 +37,7 @@ unordered_map<char, int> cardScore =
 	{ '8', 8 },
 	{ '9', 9 },
 	{ 'T', 10 },
-	{ 'J', 11 },
+	{ 'J', -1 },
 	{ 'Q', 12 },
 	{ 'K', 13 },
 	{ 'A', 14 },
@@ -50,6 +50,22 @@ void ComputeHandType(Hand& hand)
 	{
 		char card = hand.cards[i];
 		cardCount[card]++;
+	}
+	if (cardCount.contains('J'))
+	{
+		int jokerCount = cardCount['J'];
+		cardCount.erase('J');
+		char mostCard;
+		int mostCardCount = -1;
+		for (auto& it : cardCount)
+		{
+			if (it.second > mostCardCount)
+			{
+				mostCardCount = it.second;
+				mostCard = it.first;
+			}
+		}
+		cardCount[mostCard] += jokerCount;
 	}
 	for (auto& it : cardCount)
 	{
