@@ -11,14 +11,12 @@ using namespace std;
 int solveFuture(vector<int>& sequence)
 {
 	vector<int> diff;
+	bool isAllZeroes = true;
 	for (int i = 1; i < sequence.size(); i++)
 	{
-		diff.push_back(sequence[i] - sequence[i - 1]);
-	}
-	bool isAllZeroes = true;
-	for (int i = 0; i < diff.size(); i++)
-	{
-		if (diff[i] != 0)
+		int currentDiff = sequence[i] - sequence[i - 1];
+		diff.push_back(currentDiff);
+		if (currentDiff != 0)
 			isAllZeroes = false;
 	}
 	if (isAllZeroes)
@@ -34,14 +32,12 @@ int solveFuture(vector<int>& sequence)
 int solveHistory(vector<int>& sequence)
 {
 	vector<int> diff;
+	bool isAllZeroes = true;
 	for (int i = 1; i < sequence.size(); i++)
 	{
-		diff.push_back(sequence[i] - sequence[i - 1]);
-	}
-	bool isAllZeroes = true;
-	for (int i = 0; i < diff.size(); i++)
-	{
-		if (diff[i] != 0)
+		int currentDiff = sequence[i] - sequence[i - 1];
+		diff.push_back(currentDiff);
+		if (currentDiff != 0)
 			isAllZeroes = false;
 	}
 	if (isAllZeroes)
