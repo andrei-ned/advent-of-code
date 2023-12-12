@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# don't include Advent of Code puzzle inputs
+input.txt
+
 # User-specific files
 *.rsuser
 *.suo
