@@ -1,13 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <vector>
-#include <unordered_map>
-#include <algorithm>
-#include <atomic>
-#include <thread>
-#include <mutex>
 
 using namespace std;
 
@@ -28,28 +22,42 @@ vector<string> transposeMap(vector<string>& map)
 
 uint64_t solveMap(vector<string>& map)
 {
-	int sum = 0;
+	//int sum = 0;
 	for (int i = 0; i < map.size() - 1; i++)
 	{
 		// Check if reflected between i and i+1
-		bool isMirrored = true;
+		//bool isMirrored = true;
+		int differencesCount = 0;
+		//cout << "Trying reflection at " << i+1 << ", " << i+2 << ": ";
 		for (int j = i, k = i + 1; j >= 0 && k < map.size(); j--, k++)
 		{
-			//cout << "Comparing " << j << ", " << k << "\n";
-			if (map[j] != map[k])
+			//cout << "Comparing " << j << ", " << k << ": ";
+			//if (map[j] != map[k])
+			//{
+			//	isMirrored = false;
+			//	break;
+			//}
+			for (int q = 0; q < map[0].length(); q++)
 			{
-				isMirrored = false;
-				break;
+				if (map[j][q] != map[k][q])
+				{
+					differencesCount++;
+				}
 			}
 		}
-		//cout << isMirrored << "\n";
-		if (isMirrored)
+		//cout << differencesCount << "\n";
+		if (differencesCount == 1)
 		{
-			//cout << (i + 1) << ", " << (i + 2) << "\n";
-			sum += i + 1;
+			return i + 1;
 		}
+		//cout << isMirrored << "\n";
+		//if (isMirrored)
+		//{
+		//	//cout << (i + 1) << ", " << (i + 2) << "\n";
+		//	sum += i + 1;
+		//}
 	}
-	return sum;
+	return 0;
 }
 
 uint64_t solve(vector<string>& map)
@@ -74,6 +82,7 @@ int main()
 		{
 			sum += solve(map);
 			map.clear();
+			//cout << "\n\n";
 		}
 	}
 	fin.close();
