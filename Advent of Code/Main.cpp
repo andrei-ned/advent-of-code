@@ -68,7 +68,7 @@ int getCalibration(string input)
 
 int main()
 {
-	ifstream fin("day1input.txt");
+	ifstream fin("input.txt");
 
 	string currentIn;
 	int sum = 0;

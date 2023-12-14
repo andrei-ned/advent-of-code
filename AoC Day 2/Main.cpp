@@ -10,7 +10,7 @@ using namespace std;
 
 int main()
 {
-	ifstream fin("day2input.txt");
+	ifstream fin("input.txt");
 
 	unordered_map<string, int> possibleCubes =
 	{

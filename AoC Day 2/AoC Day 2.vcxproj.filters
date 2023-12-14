@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="day2Input.txt">
+    <Text Include="input.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
