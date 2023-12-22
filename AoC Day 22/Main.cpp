@@ -5,8 +5,13 @@
 #include <assert.h>
 #include <unordered_map>
 #include <algorithm>
+#include <set>
 
 using namespace std;
+
+struct Brick;
+bool bricksSortPred(const Brick& a, const Brick& b);
+bool bricksSortPredPtr(const Brick* a, const Brick* b);
 
 struct Pos
 {
@@ -46,6 +51,35 @@ struct Brick
 	{
 		cout << "{{" << p1.x << "," << p1.y << "," << p1.z << "},{" << p2.x << "," << p2.y << "," << p2.z << "}}";
 	}
+
+	void disintegrateRecursively(set<const Brick*>& disintegratedSet) const
+	{
+		disintegratedSet.insert(this);
+		vector<Brick*> toDisintegrate;
+		//sort(toDisintegrate.begin(), toDisintegrate.end(), bricksSortPredPtr);
+		for (int i = 0; i < bricksImSupporting.size(); i++)
+		{
+			Brick* brickCurr = bricksImSupporting[i];
+			bool willFall = true;
+			for (int j = 0; j < brickCurr->bricksImSupportedBy.size(); j++)
+			{
+				Brick* support = brickCurr->bricksImSupportedBy[j];
+				if (!disintegratedSet.contains(support))
+				{
+					willFall = false; // there is a brick supporting this that didn't fall yet
+				}
+			}
+			if (willFall)
+			{
+				toDisintegrate.push_back(brickCurr);
+				disintegratedSet.insert(brickCurr);
+			}
+		}
+		for (Brick* br : toDisintegrate)
+		{
+			br->disintegrateRecursively(disintegratedSet);
+		}
+	}
 };
 
 bool bricksSortPred(const Brick& a, const Brick& b)
@@ -57,6 +91,12 @@ bool bricksSortPred(const Brick& a, const Brick& b)
 		return a.p1.y < b.p1.y;
 	}
 	return a.p1.z < b.p1.z;
+}
+bool bricksSortPredPtr(const Brick* a, const Brick* b)
+{
+	const Brick& aRef = *a;
+	const Brick& bRef = *b;
+	return bricksSortPred(aRef, bRef);
 }
 
 bool doBricksIntersectXY(const Brick& a, const Brick& b, bool debug = false)
@@ -145,6 +185,29 @@ void solvePart1(vector<Brick>& bricks)
 	cout << safeCount << " bricks can be safely disintegrated\n";
 }
 
+// part 1 should be run before to fall the bricks
+void solvePart2(vector<Brick>& bricks)
+{
+	uint64_t totalFalls = 0;
+	for (int i = 0; i < bricks.size(); i++)
+	{
+		//cout << "Brick " << i << " disintegrates ";
+		Brick& brickCurr = bricks[i];
+		set<const Brick*> disintegratedBricks;
+		brickCurr.disintegrateRecursively(disintegratedBricks);
+		int fallCount = disintegratedBricks.size() - 1; // -1 so we don't count self
+		totalFalls += fallCount;
+		//cout << disintegrateCount << " bricks: ";
+		//for (const Brick* br : disintegratedBricks)
+		//{
+		//	br->debugBrick();
+		//}
+		//cout << "\n";
+	}
+	cout << "Total falls is " << totalFalls << "\n";
+	// 1310 is too low
+}
+
 void debugIntersections()
 {
 	assert(doBricksIntersectXY({ {0,0,1}, {0,0,1} }, { {0,0,3}, {0,0,6} }) == true);
@@ -182,7 +245,5 @@ int main()
 	fin.close();
 
 	solvePart1(bricks);
+	solvePart2(bricks);
 }
-
-// 466 is too high
-// 477 is too high
