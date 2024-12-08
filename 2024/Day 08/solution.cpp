@@ -29,13 +29,15 @@ int main()
         }
     }
 
-    set<pair<int,int>> antinodes;
+    set<pair<int,int>> antinodes1;
+    set<pair<int,int>> antinodes2;
     for (const auto&[key,positions] : antennas)
     {
         if (positions.size() < 2)
             continue;
         for (int i = 0; i < positions.size(); i++)
         {
+            antinodes2.insert(positions[i]); // Part 2
             for (int j = 0; j < positions.size(); j++)
             {
                 if (i == j) continue;
@@ -43,10 +45,21 @@ int main()
                 int yDiff = positions[j].second - positions[i].second;
                 int xAnti = positions[j].first + xDiff;
                 int yAnti = positions[j].second + yDiff;
+
+                // Part 1
                 if (xAnti >= 0 && xAnti < map[0].size() && yAnti >= 0 && yAnti < map.size())
                 {
                     map[yAnti][xAnti] = '#';
-                    antinodes.insert(make_pair(xAnti,yAnti));
+                    antinodes1.insert(make_pair(xAnti,yAnti));
+                }
+
+                // Part 2
+                while (xAnti >= 0 && xAnti < map[0].size() && yAnti >= 0 && yAnti < map.size())
+                {
+                    map[yAnti][xAnti] = '#';
+                    antinodes2.insert(make_pair(xAnti,yAnti));
+                    xAnti += xDiff;
+                    yAnti += yDiff;
                 }
             }
         }
@@ -55,5 +68,6 @@ int main()
     for (int i = 0; i < map.size(); i++)
         cout << map[i] << "\n";
 
-    cout << "There are " << antinodes.size() << " unique antinodes\n";
+    cout << "There are " << antinodes1.size() << " unique antinodes\n";
+    cout << "There are actually " << antinodes2.size() << " unique antinodes\n";
 }

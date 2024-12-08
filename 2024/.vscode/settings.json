@@ -1,6 +1,8 @@
 {
     "dotnet.defaultSolution": "Day4.sln",
     "files.associations": {
-        "utility": "cpp"
+        "utility": "cpp",
+        "set": "cpp",
+        "iostream": "cpp"
     }
 }
