@@ -1,3 +1,6 @@
 {
-    "dotnet.defaultSolution": "Day4.sln"
+    "dotnet.defaultSolution": "Day4.sln",
+    "files.associations": {
+        "utility": "cpp"
+    }
 }

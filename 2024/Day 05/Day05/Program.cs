@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-Dictionary<int,HashSet<int>> rules = new Dictionary<int, HashSet<int>>();
+﻿Dictionary<int,HashSet<int>> rules = new Dictionary<int, HashSet<int>>();
 
 using (var fileStream = File.OpenRead("input.txt"))
     using (var streamReader = new StreamReader(fileStream))
