@@ -49,14 +49,14 @@ int main()
                 // Part 1
                 if (xAnti >= 0 && xAnti < map[0].size() && yAnti >= 0 && yAnti < map.size())
                 {
-                    map[yAnti][xAnti] = '#';
+                    //map[yAnti][xAnti] = '#';
                     antinodes1.insert(make_pair(xAnti,yAnti));
                 }
 
                 // Part 2
                 while (xAnti >= 0 && xAnti < map[0].size() && yAnti >= 0 && yAnti < map.size())
                 {
-                    map[yAnti][xAnti] = '#';
+                    //map[yAnti][xAnti] = '#';
                     antinodes2.insert(make_pair(xAnti,yAnti));
                     xAnti += xDiff;
                     yAnti += yDiff;
