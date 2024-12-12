@@ -1,9 +1,6 @@
-﻿using System.Data;
+﻿List<string> farmStrings = new List<string>();
 
-List<string> farmStrings = new List<string>();
-
-
-
+// Read input
 using (var fileStream = File.OpenRead("input.txt"))
     using (var streamReader = new StreamReader(fileStream))
     {
@@ -14,6 +11,7 @@ using (var fileStream = File.OpenRead("input.txt"))
         }
     }
 
+// Make 2d farm array, with padded boundary
 Cell[][] farm = new Cell[farmStrings.Count+2][];
 farm[0] = new Cell[farmStrings[0].Length + 2];
 farm[farmStrings.Count+1] = new Cell[farmStrings[0].Length + 2];
@@ -36,7 +34,6 @@ for (int y = 0; y < farmStrings.Count ; y++)
 }
 
 (int,int)[] directions = new[] {(1,0),(0,1),(-1,0),(0,-1)};
-(int,int)[] corners = new[] {(-1,-1),(-1,1),(1,-1),(1,1)};
 
 // Returns (area, perimeter, sides)
 (int, int, int) MeasureRegion(int x, int y)
@@ -121,5 +118,3 @@ public class Cell
     public char plant;
     public bool visited;
 }
-
-
