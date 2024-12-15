@@ -13,6 +13,7 @@
         "type_traits": "cpp",
         "xhash": "cpp",
         "xutility": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "iosfwd": "cpp"
     }
 }
