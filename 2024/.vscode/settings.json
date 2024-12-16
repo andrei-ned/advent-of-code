@@ -15,6 +15,12 @@
         "xutility": "cpp",
         "iterator": "cpp",
         "iosfwd": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "map": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "queue": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }
