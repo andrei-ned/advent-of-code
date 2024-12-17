@@ -1,4 +1,6 @@
 ﻿Computer3Bit computer = new Computer3Bit();
+string program_instructions;
+ulong b, c;
 
 // Read input
 using (var fileStream = File.OpenRead("input.txt"))
@@ -10,9 +12,13 @@ using (var fileStream = File.OpenRead("input.txt"))
             line = streamReader.ReadLine();
             computer.registers[i] = uint.Parse(line.Split(" ")[2]);
         }
+        b = computer.b_reg;
+        c = computer.c_reg;
         line = streamReader.ReadLine(); // empy line
         line = streamReader.ReadLine();
-        Console.WriteLine(line);
+        //Console.WriteLine(line);
+        program_instructions = line.Split(" ")[1];
+        //Console.WriteLine(program_instructions);
         var commaSplit = line.Split(",");
         computer.instructions = new byte[commaSplit.Length];
         computer.instructions[0] = byte.Parse(commaSplit[0].Split(" ")[1]);
@@ -23,8 +29,30 @@ using (var fileStream = File.OpenRead("input.txt"))
         
     }
 
+// Part 1
 while (computer.Step());
 Console.WriteLine(computer.output);
+
+// Part 2
+ulong a = 1;
+while (true)
+{
+    computer.Reset(a, b, c);
+    while (computer.Step()/* && program_instructions.Substring(0, computer.output.Length) == computer.output*/);
+    if (computer.Halted() && computer.output == program_instructions)
+    {
+        Console.WriteLine($"Found register A: {a}");
+        break;
+    }
+    string partial = program_instructions.Substring(program_instructions.Length - computer.output.Length);
+    if (partial == computer.output)
+    {
+        a = a << 3;
+    }
+    else
+        a++;
+    //Console.WriteLine($"{a}: {computer.output} #==# {partial}");
+}
 
 class Computer3Bit
 {
@@ -35,6 +63,23 @@ class Computer3Bit
     public byte[] instructions;
     public string output = "";
     private uint instruction_ptr;
+
+    public event Action OnOutput;
+
+    public void Reset(ulong a, ulong b, ulong c)
+    {
+        instruction_ptr = 0;
+        a_reg = a;
+        b_reg = b;
+        c_reg = c;
+        output = "";
+    }
+
+    public bool Halted()
+    {
+        return instruction_ptr >= instructions.Length;
+    }
+
     // Returns false if halting
     public bool Step()
     {
