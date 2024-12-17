@@ -39,7 +39,7 @@ while (true)
 {
     computer.Reset(a, b, c);
     while (computer.Step()/* && program_instructions.Substring(0, computer.output.Length) == computer.output*/);
-    if (computer.Halted() && computer.output == program_instructions)
+    if (computer.output == program_instructions)
     {
         Console.WriteLine($"Found register A: {a}");
         break;
