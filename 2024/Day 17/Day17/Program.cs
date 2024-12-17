@@ -38,7 +38,7 @@ ulong a = 1;
 while (true)
 {
     computer.Reset(a, b, c);
-    while (computer.Step()/* && program_instructions.Substring(0, computer.output.Length) == computer.output*/);
+    while (computer.Step());
     if (computer.output == program_instructions)
     {
         Console.WriteLine($"Found register A: {a}");
@@ -46,9 +46,7 @@ while (true)
     }
     string partial = program_instructions.Substring(program_instructions.Length - computer.output.Length);
     if (partial == computer.output)
-    {
         a = a << 3;
-    }
     else
         a++;
     //Console.WriteLine($"{a}: {computer.output} #==# {partial}");
@@ -64,8 +62,6 @@ class Computer3Bit
     public string output = "";
     private uint instruction_ptr;
 
-    public event Action OnOutput;
-
     public void Reset(ulong a, ulong b, ulong c)
     {
         instruction_ptr = 0;
@@ -73,11 +69,6 @@ class Computer3Bit
         b_reg = b;
         c_reg = c;
         output = "";
-    }
-
-    public bool Halted()
-    {
-        return instruction_ptr >= instructions.Length;
     }
 
     // Returns false if halting
