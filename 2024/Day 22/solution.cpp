@@ -4,11 +4,6 @@
 #include <vector>
 #include <map>
 
-
-// This works for the example, but I got a number that's too low for the proper input
-// I guessed the correct answer based on another attempt that was too high
-// Not sure what's wrong with this solution
-
 using namespace std;
 
 #define INT uint64_t
@@ -36,9 +31,9 @@ inline int price(INT secret)
     return secret % 10;
 }
 
-void print_tuple(tuple<int,int,int,int> x, std::ostream& stream)
+void print_tuple(tuple<int,int,int,int> x)
 {
-    stream << std::get<0>(x) << ","
+    cout   << std::get<0>(x) << ","
            << std::get<1>(x) << ","
            << std::get<2>(x) << ","
            << std::get<3>(x);
@@ -47,13 +42,12 @@ void print_tuple(tuple<int,int,int,int> x, std::ostream& stream)
 int main()
 {
     ifstream fin("input.txt");
-    ofstream fout("test.txt");
     vector<vector<int>> prices;
     INT secret_number, sum = 0;
     while (fin >> secret_number)
     {
         //cout << secret_number << ": ";
-        vector<int> prices_for_this_number;
+        vector<int> prices_for_this_number{price(secret_number)};
         for (int i = 0; i < 2000; i++)
         {
             secret_number = next(secret_number);
@@ -71,7 +65,6 @@ int main()
         map<tuple<int,int,int,int>, int> bananas_for_this_buyer;
         for (int j = 4; j < prices[i].size(); j++)
         {
-            
             int a = prices[i][j-3] - prices[i][j-4];
             int b = prices[i][j-2] - prices[i][j-3];
             int c = prices[i][j-1] - prices[i][j-2];
@@ -100,5 +93,5 @@ int main()
         }
     }
     cout << "Part 2: " << max_bs << " with sequence " ;
-    print_tuple(best_seq, std::cout);
+    print_tuple(best_seq);
 }
