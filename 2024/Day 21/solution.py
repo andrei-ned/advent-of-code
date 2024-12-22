@@ -14,7 +14,7 @@ num_keypad = {
     '7':(0,0), '8':(1,0), '9':(2,0),
     '4':(0,1), '5':(1,1), '6':(2,1),
     '1':(0,2), '2':(1,2), '3':(2,2),
-               '0':(1,3), 'A':(2,3),
+    'x':(0,3), '0':(1,3), 'A':(2,3),
 }
 
 #     +---+---+
@@ -23,7 +23,7 @@ num_keypad = {
 # | < | v | > |
 # +---+---+---+
 arrow_keypad = {
-               '^':(1,0), 'A':(2,0),
+    'x':(0,0), '^':(1,0), 'A':(2,0),
     '<':(0,1), 'v':(1,1), '>':(2,1),
 }
 
@@ -36,34 +36,56 @@ def solve_any(code, keypad):
         # print(f"from {curr} to {key}")
         x_diff = pos_next[0] - pos_curr[0]
         y_diff = pos_next[1] - pos_curr[1]
-        while x_diff > 0:
-            x_diff -= 1
-            out += ">"
-        while y_diff < 0:
-            y_diff += 1
-            out += "^"
-        while y_diff > 0:
-            y_diff -= 1
-            out += "v"
-        while x_diff < 0:
-            x_diff += 1
-            out += "<"
+        moves = ""
+        if keypad == num_keypad:
+            priorities = "<^v>"
+            if pos_next[0] == 0 and pos_curr[1] == 3: # avoid going into hole by going left in bottom row
+                priorities = ">^v<"
+            if pos_curr[0] == 0 and pos_next[1] == 3: # avoid going into hole by going down
+                priorities = ">^v<"
+        else:
+            priorities = "<^v>"
+            if pos_next[0] == 0: # avoid going into hole right to left
+                priorities = "v<^>"
+            if pos_curr[0] == 0 and pos_next[1] == 0: # avoid going into hole upwards
+                priorities = "<>^v"
+        for dir in priorities:
+            match dir:
+                case '>':
+                    while x_diff > 0:
+                        x_diff -= 1
+                        moves += ">"
+                case '<':
+                    while x_diff < 0:
+                        x_diff += 1
+                        moves += "<"
+                case '^':
+                    while y_diff < 0:
+                        y_diff += 1
+                        moves += "^"
+                case 'v':
+                    while y_diff > 0:
+                        y_diff -= 1
+                        moves += "v"
+        
+        out += moves
         out += "A"
         # print(key)
         # print(out)
         curr = key
-    print(out)
+    # print(out)
     return out
 
 def solve_directional(code):
     return solve_any(code, arrow_keypad)
 
-def solve_numeric(code):
+def solve_numeric(code, arrow_keypad_count):
     key_codes = solve_any(code, num_keypad)
-    for i in range(2):
+    for i in range(arrow_keypad_count):
         key_codes = solve_directional(key_codes)
     return key_codes
 
+# only for part one codes
 def debug_key(code):
     def update_pos(key, pos):
         match key:
@@ -122,17 +144,21 @@ def debug_key(code):
 with open("Day 21/input.txt") as file:
     lines = [line.rstrip() for line in file]
 
-sum1 = 0
-for line in lines:
-    key_presses = solve_numeric(line)
-    length = len(key_presses)
-    num = int(line[:-1])
-    print(f"{line}: {key_presses}")
-    print(f"{length} * {num}")
-    # if line == "379A":
-    #     debug_key(key_presses)
-    sum1 += length * num
+for i in [2, 25]:
+    sum = 0
+    for line in lines:
+        key_presses = solve_numeric(line, i)
+        length = len(key_presses)
+        num = int(line[:-1])
+        # print(f"{line}: {key_presses}")
+        # print(f"{length} * {num}")
+        # debug_key(key_presses)
+        sum += length * num
 
-print(f"Part 1: {sum1}")
+    print(f"Sum of complexities for {i} robot directional keypads: {sum}")
 
 #os.system('cls')
+#print(solve_any("029A", num_keypad))
+
+# for x in solve_any_get_all_solutions("029A", num_keypad):
+#     print(x)
