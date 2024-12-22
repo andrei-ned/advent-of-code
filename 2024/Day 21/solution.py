@@ -1,5 +1,6 @@
 import os
 import time
+import functools
 
 # +---+---+---+
 # | 7 | 8 | 9 |
@@ -27,63 +28,68 @@ arrow_keypad = {
     '<':(0,1), 'v':(1,1), '>':(2,1),
 }
 
-def solve_any(code, keypad):
-    out = ""
+@functools.cache
+def solve_directions(origin, target, is_directional):
+    keypad = arrow_keypad if is_directional else num_keypad
+    pos_curr = list(keypad[origin])
+    pos_next = list(keypad[target])
+    moves = ""
+    priorities = "<^v>"
+    x_diff = pos_next[0] - pos_curr[0]
+    y_diff = pos_next[1] - pos_curr[1]
+    if keypad == num_keypad:
+        priorities = "<^v>"
+        if pos_next[0] == 0 and pos_curr[1] == 3: # avoid going into hole by going left in bottom row
+            priorities = ">^v<"
+        if pos_curr[0] == 0 and pos_next[1] == 3: # avoid going into hole by going down
+            priorities = ">^v<"
+    else:
+        priorities = "<^v>"
+        if pos_next[0] == 0: # avoid going into hole right to left
+            priorities = "v<^>"
+        if pos_curr[0] == 0 and pos_next[1] == 0: # avoid going into hole upwards
+            priorities = "<>^v"
+    for dir in priorities:
+        match dir:
+            case '>':
+                while x_diff > 0:
+                    x_diff -= 1
+                    moves += ">"
+            case '<':
+                while x_diff < 0:
+                    x_diff += 1
+                    moves += "<"
+            case '^':
+                while y_diff < 0:
+                    y_diff += 1
+                    moves += "^"
+            case 'v':
+                while y_diff > 0:
+                    y_diff -= 1
+                    moves += "v"
+    return moves + 'A'
+
+@functools.cache
+def solve_length(from_key, to_key, depth):
+    is_numpad = from_key.isdigit() or to_key.isdigit()
+    keys = solve_directions(from_key, to_key, not is_numpad)
+    if depth == target_depth:
+        return len(keys)
+    sum = 0
+    curr = 'A'
+    for key in keys:
+        sum += solve_length(curr, key, depth + 1)
+        curr = key
+    return sum
+
+def solve_length_init(code):
+    sum = 0
     curr = 'A'
     for key in code:
-        pos_curr = list(keypad[curr])
-        pos_next = list(keypad[key])
-        # print(f"from {curr} to {key}")
-        x_diff = pos_next[0] - pos_curr[0]
-        y_diff = pos_next[1] - pos_curr[1]
-        moves = ""
-        if keypad == num_keypad:
-            priorities = "<^v>"
-            if pos_next[0] == 0 and pos_curr[1] == 3: # avoid going into hole by going left in bottom row
-                priorities = ">^v<"
-            if pos_curr[0] == 0 and pos_next[1] == 3: # avoid going into hole by going down
-                priorities = ">^v<"
-        else:
-            priorities = "<^v>"
-            if pos_next[0] == 0: # avoid going into hole right to left
-                priorities = "v<^>"
-            if pos_curr[0] == 0 and pos_next[1] == 0: # avoid going into hole upwards
-                priorities = "<>^v"
-        for dir in priorities:
-            match dir:
-                case '>':
-                    while x_diff > 0:
-                        x_diff -= 1
-                        moves += ">"
-                case '<':
-                    while x_diff < 0:
-                        x_diff += 1
-                        moves += "<"
-                case '^':
-                    while y_diff < 0:
-                        y_diff += 1
-                        moves += "^"
-                case 'v':
-                    while y_diff > 0:
-                        y_diff -= 1
-                        moves += "v"
-        
-        out += moves
-        out += "A"
-        # print(key)
-        # print(out)
+        sum += solve_length(curr, key, 0)
         curr = key
-    # print(out)
-    return out
+    return sum
 
-def solve_directional(code):
-    return solve_any(code, arrow_keypad)
-
-def solve_numeric(code, arrow_keypad_count):
-    key_codes = solve_any(code, num_keypad)
-    for i in range(arrow_keypad_count):
-        key_codes = solve_directional(key_codes)
-    return key_codes
 
 # only for part one codes
 def debug_key(code):
@@ -138,27 +144,16 @@ def debug_key(code):
         if (key == 'A' and hovered_key1 == 'A' and hovered_key2 == 'A'):
             out += hovered_key3
         print(out)
-        time.sleep(.5)
-
+        time.sleep(.75)
 
 with open("Day 21/input.txt") as file:
     lines = [line.rstrip() for line in file]
 
-for i in [2, 25]:
-    sum = 0
-    for line in lines:
-        key_presses = solve_numeric(line, i)
-        length = len(key_presses)
-        num = int(line[:-1])
-        # print(f"{line}: {key_presses}")
-        # print(f"{length} * {num}")
-        # debug_key(key_presses)
-        sum += length * num
+target_depth = 25
+sum = 0
+for line in lines:
+    length = solve_length_init(line)
+    num = int(line[:-1])
+    sum += length * num
 
-    print(f"Sum of complexities for {i} robot directional keypads: {sum}")
-
-#os.system('cls')
-#print(solve_any("029A", num_keypad))
-
-# for x in solve_any_get_all_solutions("029A", num_keypad):
-#     print(x)
+print(f"Sum of complexities for {target_depth} robot directional keypads: {sum}")
