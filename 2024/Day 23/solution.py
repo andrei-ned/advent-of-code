@@ -35,25 +35,23 @@ print(f"There are {lan_parties_with_t} sets of three inter-connected computers w
 
 # --- Part 2
 max_lan_size = -1
-def check_lan(node_list, lan_list, explored_s):
+def check_lan(node_list, lan_list, idx):
     global max_lan_size
-    for node in node_list:
-        if node in explored_set or node in explored_s:
-            continue
-        if node in lan_list:
+    for i in range(idx,len(node_list)):
+        node = node_list[i]
+        if node in explored_set:
             continue
         if not all(node in graph[n] for n in lan_list):
             continue
         lan_list.append(node)
-        check_lan(node_list, lan_list, explored_s)
+        check_lan(node_list, lan_list, i+1)
         if len(lan_list) > max_lan_size:
             max_lan_size = len(lan_list)
             print(f"Found bigger lan size {max_lan_size}: {','.join(x for x in sorted(lan_list))}")
         lan_list.remove(node)
-        explored_s.add(node)
 
 explored_set = set()
 for node in nodes_set:
     lan = [node]
-    check_lan(graph[node], lan, set())
+    check_lan(graph[node], lan, 0)
     explored_set.add(node)
