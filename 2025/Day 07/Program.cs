@@ -4,7 +4,10 @@ using (var fileStream = File.OpenRead("input.txt"))
 using (var streamReader = new StreamReader(fileStream))
 {
     string line = streamReader.ReadLine();
-    HashSet<int> beams = [line.IndexOf('S')];
+    int start = line.IndexOf('S');
+    HashSet<int> beams = [start];
+    long[] timelines = new long[line.Length];
+    timelines[start] = 1;
     while (!streamReader.EndOfStream)
     {
         line = streamReader.ReadLine();
@@ -20,9 +23,18 @@ using (var streamReader = new StreamReader(fileStream))
                     beams.Add(i+1);
                     beams.Remove(i);
                 }
+
+                if (timelines[i]> 0)
+                {
+                    timelines[i + 1] += timelines[i];
+                    timelines[i - 1] += timelines[i];
+                    timelines[i] = 0;
+                }
             }
         }
     }
+
+    Console.WriteLine($"No of timelines: {timelines.Sum()}");
 }
 
 Console.WriteLine($"Total beam splits: {noOfSplits}");
