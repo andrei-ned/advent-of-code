@@ -1,17 +1,26 @@
 ﻿using (var fileStream = File.OpenRead("input.txt"))
 using (var streamReader = new StreamReader(fileStream))
 {
-    long sum = 0;
+    long sum1 = 0;
+    long sum2 = 0;
     while (!streamReader.EndOfStream)
     {
-        var machine = new Machine(streamReader.ReadLine());
-        sum += machine.ComputePartOne();
+        string line = streamReader.ReadLine();
+        var machine = new Machine(line);
+        sum1 += machine.ComputePartOne();
+        sum2 += machine.ComputePartTwo();
+        Console.WriteLine($"Machine {line} needs btn presses: {sum1} & {sum2}");
     }
-    Console.WriteLine($"Fewest total button presses = {sum}");
+    Console.WriteLine($"Fewest total button presses for configuring lights = {sum1}");
+    Console.WriteLine($"Fewest total button presses for configuring joltage = {sum2}");
 }
 
 class Machine
 {
+    public string lights;
+    public List<List<int>> buttons;
+    public int[] joltage;
+
     public Machine(string line)
     {
         var lineSplit = line.Split(" ");
@@ -25,7 +34,7 @@ class Machine
         }
         int lastIdx = lineSplit.Length - 1;
         var joltageStr = lineSplit[lastIdx].Substring(1, lineSplit[lastIdx].Length - 2);
-        joltage = joltageStr.Split(",").Select(x => int.Parse(x)).ToList();
+        joltage = joltageStr.Split(",").Select(x => int.Parse(x)).ToArray();
     }
 
     public int ComputePartOne()
@@ -43,29 +52,28 @@ class Machine
             foreach(int btnCombo in ChooseBtns(pressCount))
             {
                 int mask = 0;
-                Console.Write($"btn combo {btnCombo}: press btns = ");
+                //Console.Write($"btn combo {btnCombo}: press btns = ");
                 for (int i = 0; i < buttons.Count; i++) // press all buttons in combo
                 {
                     if ((btnCombo & (1<<i)) != 0)
                     {
-                        Console.Write($"press {i}, lights = ");
+                        //Console.Write($"press {i}, lights = ");
                         foreach (int light in buttons[i])
                         {
-                            Console.Write($"{light}, ");
+                            //Console.Write($"{light}, ");
                             mask ^= 1 << light;
                         }
                     }
                 }
-                Console.Write($"mask = {mask}");
-                //Console.Write($"{btnCombo},");
-                Console.WriteLine();
+                //Console.Write($"mask = {mask}");
+                //Console.WriteLine();
                 if (mask == targetMask)
                 {
-                    Console.WriteLine($"FOUND BTN COMBO WITH {pressCount} PRESSES");
+                    //Console.WriteLine($"FOUND BTN COMBO WITH {pressCount} PRESSES");
                     return pressCount;
                 }
             }
-            Console.WriteLine();
+            //Console.WriteLine();
         }
         return -1;
     }
@@ -94,7 +102,71 @@ class Machine
         }
     }
 
-    public string lights;
-    public List<List<int>> buttons;
-    public List<int> joltage;
+    public int ComputePartTwo()
+    {
+        var currJoltage = new int[joltage.Length];
+        int presses = ComputePartTwo(0, currJoltage, 0);
+        Console.WriteLine();
+        return presses;
+    }
+
+    // TODO: this is ok for example, but too slow for actual input
+    int ComputePartTwo(int currentBtn, int[] currentJoltage, int btnPresses, int best = int.MaxValue)
+    {
+        if (btnPresses >= best)
+        {
+            return best; // pruning
+        }
+        if (CompareJoltage(currentJoltage) == 0)
+        {
+            Console.WriteLine($"Found matching joltage with {btnPresses} btn presses: ");
+            return btnPresses; // this is a solution
+        }
+        if (CompareJoltage(currentJoltage) < 0)
+        {
+            //Console.Write('.');
+            return best; // this exceeds joltage
+        }
+        if (currentBtn >= buttons.Count)
+        {
+            return best; // this is the last button
+        }
+
+        int ret = ComputePartTwo(currentBtn + 1, currentJoltage, btnPresses, best); // no presses on current btn
+        best = Math.Min(best, ret);
+        PressJoltageButton(currentBtn, currentJoltage);
+        ret = ComputePartTwo(currentBtn, currentJoltage, btnPresses + 1, best); // +1 press on current btn
+        best = Math.Min(best, ret);
+        PressJoltageButton(currentBtn, currentJoltage, -1); // undo btn press
+        return best;
+    }
+
+    void PressJoltageButton(int btnIndex, int[] targetJoltage, int value=1)
+    {
+        foreach(int jolt in buttons[btnIndex])
+        {
+            targetJoltage[jolt] += value;
+        }
+    }
+
+    // -1 = other joltage exceeds target joltage
+    //  0 = joltages are equal
+    //  1 = other joltage is under target joltage
+    int CompareJoltage(int[] otherJoltage)
+    {
+        bool isEqual = true;
+        for (int i = 0; i < joltage.Length; i++)
+        {
+            int diff = joltage[i] - otherJoltage[i];
+            if (diff < 0)
+            {
+                return -1;
+            }
+            if (diff != 0)
+            {
+                isEqual = false;
+            }
+        }
+        return isEqual ? 0 : 1;
+    }
 }
