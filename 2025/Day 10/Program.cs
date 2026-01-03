@@ -32,6 +32,7 @@ class Machine
             string numsStr = lineSplit[i].Substring(1, lineSplit[i].Length - 2);
             buttons.Add(numsStr.Split(",").Select(x => int.Parse(x)).ToList());
         }
+        //buttons.Sort((a,b) => a.Count.CompareTo(b.Count));
         int lastIdx = lineSplit.Length - 1;
         var joltageStr = lineSplit[lastIdx].Substring(1, lineSplit[lastIdx].Length - 2);
         joltage = joltageStr.Split(",").Select(x => int.Parse(x)).ToArray();
@@ -102,16 +103,16 @@ class Machine
         }
     }
 
-    public int ComputePartTwo()
+    public long ComputePartTwo()
     {
         var currJoltage = new int[joltage.Length];
-        int presses = ComputePartTwo(0, currJoltage, 0);
+        long presses = ComputePartTwo(0, currJoltage, 0);
         Console.WriteLine();
         return presses;
     }
 
     // TODO: this is ok for example, but too slow for actual input
-    int ComputePartTwo(int currentBtn, int[] currentJoltage, int btnPresses, int best = int.MaxValue)
+    long ComputePartTwo(int currentBtn, int[] currentJoltage, int btnPresses, long best = long.MaxValue)
     {
         if (btnPresses >= best)
         {
@@ -132,7 +133,7 @@ class Machine
             return best; // this is the last button
         }
 
-        int ret = ComputePartTwo(currentBtn + 1, currentJoltage, btnPresses, best); // no presses on current btn
+        long ret = ComputePartTwo(currentBtn + 1, currentJoltage, btnPresses, best); // no presses on current btn
         best = Math.Min(best, ret);
         PressJoltageButton(currentBtn, currentJoltage);
         ret = ComputePartTwo(currentBtn, currentJoltage, btnPresses + 1, best); // +1 press on current btn
